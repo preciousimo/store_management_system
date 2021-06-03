@@ -73,8 +73,8 @@
           <td>{{instance.category}}</td>
           <td><a href="{% url 'update_items' instance.id %}">{{instance.item_name}}</a></td>
           <td>{{instance.quantity}}</td>
-          <td>{{instance.quantity}}</td>
-          <td>{{instance.quantity}}</td>
+          <td>{{instance.timestamp}}</td>
+          <td>{{instance.last_updated}}</td>
           <td><a href="{% url 'delete_items' instance.id %}">Delete</a></td>
         </tr>
         {% endfor %}

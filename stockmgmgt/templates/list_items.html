@@ -61,7 +61,7 @@
         <tr>
           <td>{{forloop.counter}}</td>
           <td>{{instance.category}}</td>
-          <td>{{instance.item_name}}</td>
+          <td><a href="{% url 'update_items' instance.id %}">{{instance.item_name}}</a></td>
           <td>{{instance.quantity}}</td>
         </tr>
         {% endfor %}

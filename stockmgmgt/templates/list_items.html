@@ -1,19 +1,17 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item List</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
+  <title>Item List</title>
 </head>
 
 <body>
-    {{title}}<br>
-    {% for instance in queryset %}
-    {{instance.item_name}}, {{instance.quantity}}<br>
-
-    {% endfor %}
+  {{title}}<br> {% for instance in queryset %} {{instance.item_name}}, {{instance.quantity}}<br> {% endfor %}
 </body>
 
 </html>

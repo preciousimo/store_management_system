@@ -5,7 +5,7 @@ from .models import Stock
 class StockCreateForm(forms.ModelForm):
     class Meta:
         model = Stock
-        fields = ['category', 'item_name', 'quantity']
+        fields = ['category', 'item_name', 'quantity', 'date', 'last_updated']
 
         # To prevent saving object with a blank item name
         def clean_category(self):

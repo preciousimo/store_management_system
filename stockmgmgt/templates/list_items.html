@@ -41,6 +41,12 @@
   <main role="main" class="container">
     <div class="jumbotron">
       <div class="header">{{header}}</div>
+
+      <form method='POST' action=''>{% csrf_token %} {{form|crispy}}
+        <input type="submit" value='Search' />
+      </form>
+      <br>
+
       <div class="display_table"></div>
       <table class='table'>
         <thead>

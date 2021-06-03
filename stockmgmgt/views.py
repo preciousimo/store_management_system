@@ -26,8 +26,9 @@ def list_items(request):
         "queryset": queryset,
     }
     if request.method == 'POST':
-        queryset = Stock.objects.filter(#category__icontains=form['category'].value(),
-                                        item_name__icontains=form['item_name'].value()
+        queryset = Stock.objects.filter(  # category__icontains=form['category'].value(),
+            item_name__icontains=form['item_name'].value(
+            )
         )
         if form['export_to_CSV'].value() == True:
             response = HttpResponse(content_type='text/csv')
@@ -83,3 +84,11 @@ def delete_items(request, pk):
         messages.success(request, 'Deleted Successfully')
         return redirect('/list_items')
     return render(request, 'delete_items.html')
+
+
+def stock_detail(request, pk):
+    queryset = Stock.objects.get(id=pk)
+    context = {
+        "queryset": queryset,
+    }
+    return render(request, "stock_detail.html", context)

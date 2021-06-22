@@ -18,5 +18,6 @@ from django.urls import include, path
 
 urlpatterns = [
     path('', include('stockmgmgt.urls')),
+    path('accounts/', include('registration.backends.default.urls')),
     path('admin/', admin.site.urls),
 ]

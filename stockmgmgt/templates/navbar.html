@@ -1,5 +1,5 @@
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-  <a class="navbar-brand" href="#">Stock Mgmt V1.0</a>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
+  <a class="navbar-brand" href="/">Stock Mgmt V1.0</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -15,14 +15,59 @@
       <li class="nav-item">
         <a class="nav-link" href="/add_items">Add Items</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/list_history">List History</a>
+      </li>
       {% endif %}
     </ul>
-    <ul class="navbar-nav">
+    <ul class="navbar-nav ">
       {% if request.user.is_authenticated %}
-      <li><a href="/accounts/logout"><button class="btn btn-danger">{{ user }} | Logout</button></a></li>
+      <li><a href="/accounts/logout"><button class="btn btn-dark">{{ user }} | Logout</button></a></li>
       {% else %}
       <li><a href="/accounts/login">Login</a></li>
       {% endif %}
     </ul>
   </div>
 </nav>
+
+<a href="#">
+  <div id="version-display" data-toggle="modal" data-target="#myModal" class="bg-dark">SMIS Ver: 1.0</div>
+</a>
+<div class="bg-dark">
+  <div id="myModal" class="modal fade " role="dialog">
+    <div class="modal-dialog ">
+      <!-- Modal content-->
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+          <h4 class="modal-title">System Information -- Beta Version</h4>
+        </div>
+
+        <div class="modal-body">
+          <div class="dev-info">
+            <p class=""><b>STORE MANAGEMENT SYSTEM</b></p>
+            <p>VERSION: 1.O</p>
+
+            <p class="modal-header">DEVELOPERS:</p>
+            <p>
+              <a href="https://github.com/preciousimo" target="_blank">Precious Imoniakemu</a>
+            </p>
+            <p>
+              <a href="https://github.com/Bezaleel24" target="_blank">Emmanuel Adigwe</a>
+            </p>
+            <p>
+              <a href="https://github.com/samtobes" target="_blank">Samuel Ekeh</a>
+            </p>
+            <!-- <p><img src="/static/img/logo.png" alt="Developer Logo"></p> -->
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

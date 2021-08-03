@@ -181,13 +181,13 @@ def list_history(request):
     if request.method == 'POST':
         category = form['category'].value()
 
-        queryset = StockHistory.objects.filter(
-            item_name__icontains=form['item_name'].value(),
-            last_updated__range=[
-                form['start_date'].value(),
-                form['end_date'].value()
-            ]
-        )
+        # queryset = StockHistory.objects.filter(
+        #     item_name__icontains=form['item_name'].value(),
+        #     last_updated__range=[
+        #         form['start_date'].value(),
+        #         form['end_date'].value()
+        #     ]
+        # )
 
         if (category != ''):
             queryset = queryset.filter(category_id=category)
@@ -202,6 +202,7 @@ def list_history(request):
                  'QUANTITY',
                  'ISSUE QUANTITY',
                  'RECEIVE QUANTITY',
+                 'SUPPLIER'
                  'RECEIVE BY',
                  'ISSUE BY',
                  'LAST UPDATED'])
@@ -213,6 +214,7 @@ def list_history(request):
                      stock.quantity,
                      stock.issue_quantity,
                      stock.receive_quantity,
+                     stock.supplier,
                      stock.receive_by,
                      stock.issue_by,
                      stock.last_updated])

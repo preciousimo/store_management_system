@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+import django_heroku
 
 from pathlib import Path
 
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-rl!2us3m$@x)h-yxg(-$zr17pb2le6q9^y$ypfp3t^2tu^fbnw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['stock_management_system.herokuapp.com']
 
 
 # Application definition
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'stockmgmgt',
     'crispy_forms',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -84,12 +86,23 @@ WSGI_APPLICATION = 'store_management_system.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'stockmgmgt',
+#         'USER': 'postgres',
+#         'PASSWORD': 'Ochuko1%',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'stockmgmgt',
-        'USER': 'postgres',
-        'PASSWORD': 'Ochuko1%',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd4net8uncg8uul',
+        'USER': 'xyamcoipywkysp',
+        'PASSWORD': 'd7a63e46985a548ed175abcdac58b21edd2b410654f20cd574d24eeb6a7c339d',
+        'HOST': 'ec2-50-17-255-244.compute-1.amazonaws.com',
+        'PORT': '5432'
     }
 }
 
@@ -135,6 +148,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
+django_heroku.settings(locals())
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

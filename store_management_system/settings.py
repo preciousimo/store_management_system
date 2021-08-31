@@ -164,6 +164,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+account ACCOUNT_EMAIL_VERIFICATION = "none"
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window
 REGISTRATION_AUTO_LOGIN = True # Automatically log the user in.

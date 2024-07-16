@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'stockmgmgt',
     'crispy_forms',
+    'crispy_bootstrap4',
     'rest_framework',
 ]
 

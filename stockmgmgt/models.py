@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.auth.models import User
 
 class Category(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
@@ -16,7 +17,7 @@ class Stock(models.Model):
     reorder_level = models.IntegerField(default=0, blank=True, null=True)
     last_updated = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-    created_by = models.CharField(max_length=50, blank=True, null=True) 
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     
     def __str__(self):
         return self.item_name + ' ' + str(self.quantity)
@@ -37,14 +38,17 @@ class StockHistory(models.Model):
 @receiver(post_save, sender=Stock)
 def stock_history_update(sender, instance, created, **kwargs):
     if not created:  # Only log changes, not initial creation
-        StockHistory.objects.create(
-            stock=instance,
-            action='receive' if instance.receive_quantity else 'issue',  
-            quantity=instance.receive_quantity if instance.receive_quantity else instance.issue_quantity,
-            user=str(instance.receive_by) if instance.receive_quantity else str(instance.issue_by),
-            supplier=instance.supplier if instance.receive_quantity else None,
-            issue_to=instance.issue_to if instance.issue_quantity else None
-        )
-        instance.receive_quantity = 0
-        instance.issue_quantity = 0
-        instance.save()
+        try:
+            StockHistory.objects.create(
+                stock=instance,
+                action='receive' if instance.receive_quantity else 'issue',  
+                quantity=instance.receive_quantity if instance.receive_quantity else instance.issue_quantity,
+                user=str(instance.receive_by) if instance.receive_quantity else str(instance.issue_by),
+                supplier=instance.supplier if instance.receive_quantity else None,
+                issue_to=instance.issue_to if instance.issue_quantity else None
+            )
+            instance.receive_quantity = 0
+            instance.issue_quantity = 0
+            instance.save()
+        except Exception as e:
+            print(f"Error creating StockHistory: {e}")

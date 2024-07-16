@@ -1,51 +1,50 @@
 from django.db import models
-from django.urls import reverse
-
-# Create your models here.
-category_choice = (
-    ('Furniture', 'Furniture'),
-    ('IT Equipment', 'IT Equipment'),
-    ('Phone', 'Phone'),
-)
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Category(models.Model):
-    name = models.CharField(max_length=50, unique=True)  # Enforce uniqueness
+    name = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return self.name
 
-class StockItem(models.Model):  # Renamed to StockItem
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    item_name = models.CharField(max_length=50, unique=True) # Enforce uniqueness
-    quantity = models.IntegerField(default=0)  # Remove unnecessary default
-    reorder_level = models.IntegerField(default=0)
-    created_by = models.CharField(max_length=50, blank=True, null=True)
+class Stock(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True)
+    item_name = models.CharField(max_length=50, blank=True, null=True)
+    quantity = models.IntegerField(default=0, blank=True, null=True)
+    supplier = models.CharField(max_length=50, blank=True, null=True)
+    reorder_level = models.IntegerField(default=0, blank=True, null=True)
     last_updated = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-
+    created_by = models.CharField(max_length=50, blank=True, null=True) 
+    
     def __str__(self):
         return self.item_name + ' ' + str(self.quantity)
 
-    def get_absolute_url(self):
-        return reverse('stock_detail', kwargs={'pk': self.pk})  # Add a get_absolute_url method
-
-
-class StockAction(models.Model):
-    item = models.ForeignKey(StockItem, on_delete=models.CASCADE)
-    action_type = models.CharField(max_length=10, choices=[
-        ('receive', 'Receive'),
-        ('issue', 'Issue')
-    ])
-    quantity = models.IntegerField()
-    supplier = models.CharField(max_length=50, blank=True, null=True)
-    issue_to = models.CharField(max_length=50, blank=True, null=True)
-    performed_by = models.CharField(max_length=50)
+# Create a StockHistory model with the relevant fields
+class StockHistory(models.Model):
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name='history')
+    action = models.CharField(max_length=50, choices=[('issue', 'Issue'), ('receive', 'Receive')], default='issue')
+    quantity = models.IntegerField(default=0)
     timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.CharField(max_length=50, blank=True, null=True) 
+    supplier = models.CharField(max_length=50, blank=True, null=True) 
+    issue_to = models.CharField(max_length=50, blank=True, null=True) 
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.action_type == 'receive':
-            self.item.quantity += self.quantity
-        elif self.action_type == 'issue':
-            self.item.quantity -= self.quantity
-        self.item.save()
+    def __str__(self):
+        return f"{self.action} of {self.quantity} {self.stock.item_name}"
+
+@receiver(post_save, sender=Stock)
+def stock_history_update(sender, instance, created, **kwargs):
+    if not created:  # Only log changes, not initial creation
+        StockHistory.objects.create(
+            stock=instance,
+            action='receive' if instance.receive_quantity else 'issue',  
+            quantity=instance.receive_quantity if instance.receive_quantity else instance.issue_quantity,
+            user=str(instance.receive_by) if instance.receive_quantity else str(instance.issue_by),
+            supplier=instance.supplier if instance.receive_quantity else None,
+            issue_to=instance.issue_to if instance.issue_quantity else None
+        )
+        instance.receive_quantity = 0
+        instance.issue_quantity = 0
+        instance.save()

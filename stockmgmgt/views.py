@@ -164,9 +164,14 @@ def list_history(request):
 
     if request.method == 'POST':
         category = form['category'].value()
+        start_date = form['start_date'].value()
+        end_date = form['end_date'].value()
 
         if category:
-            queryset = queryset.filter(stock__category_id=category)  
+            queryset = queryset.filter(stock__category_id=category)
+
+        if start_date and end_date:  # Only filter if both dates are provided
+            queryset = queryset.filter(timestamp__range=[start_date, end_date])
 
         if form['export_to_CSV'].value():
             return export_to_csv(queryset)

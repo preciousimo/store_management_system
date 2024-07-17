@@ -1,115 +1,76 @@
-{% load static %} {% load crispy_forms_tags %}
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
+{% block title %}List Items{% endblock %}
 
-  <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/navbar-fixed/">
-
-  <!-- Bootstrap core CSS -->
-
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
-
-  <style>
-    .bd-placeholder-img {
-      font-size: 1.125rem;
-      text-anchor: middle;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-    
-    @media (min-width: 768px) {
-      .bd-placeholder-img-lg {
-        font-size: 3.5rem;
-      }
-    }
-  </style>
-  <!-- Custom styles for this template -->
-  <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
-</head>
-
-<body>
-  {% include 'navbar.html' %}
-
-  <main role="main" class="container">
-    {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-      <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <div class="jumbotron">
-      <div class="header">{{header}}</div>
-      <div class="row">
-        <div class="col-sm-2">
-          <form method='POST' action=''>{% csrf_token %} {{form|crispy}}
-            <input class="btn btn-primary mybutton" type="submit" value='Search' />
-          </form>
-          <br><br>
-          <a href="/add_items">
-            <div class="btn btn-primary mybutton">Add Items</div>
-          </a><br><br>
-          <a href="/list_history">
-            <div class="btn btn-primary mybutton">List History</div>
-          </a><br>
+{% block content %}
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Search and Actions</h5>
+            <form method='POST' action=''>{% csrf_token %} {{form|crispy}}
+              <input class="btn btn-primary mybutton" type="submit" value='Search' />
+            </form>
+            <br>
+            <a href="{% url 'add_items' %}" class="btn btn-primary mybutton mt-2">Add Items</a><br><br>
+            <a href="{% url 'list_history' %}" class="btn btn-primary mybutton">List History</a>
+          </div>
         </div>
-        <br>
+      </div>
 
-        <div class="col-sm-10">
-          <div class="display_table"></div>
-          <table class='table' id="tblData">
-            <thead>
-              <tr>
-                <!-- <th>COUNT</th> -->
-                <!-- <th>ID</th> -->
-                <th>CATEGORY</th>
-                <th>ITEM NAME</th>
-                <th>QUANTITY IN STORE</th>
-                <th>REORDER LEVEL</th>
-                <th>TIMESTAMP</th>
-                <th>LAST UPDATED</th>
-                <th>DELETE</th>
-              </tr>
-            </thead>
-            {% for instance in queryset %}
-            <tbody>
-              <tr>
-                <!-- <td>{{forloop.counter}}</td>
-                <td>{{instance.id}}</td> -->
-                <td>{{instance.category}}</td>
-                <td><a href="{% url 'update_items' instance.id %}">{{instance.item_name}}</a></td>
-                <td>
-                  {% if instance.reorder_level >= instance.quantity %}
-                  <div style="background-color: orange;">
-                    <a href="{% url 'stock_detail' instance.id %}">{{instance.quantity}}</a>
-                  </div>
-                  {% else %} <a href="{% url 'stock_detail' instance.id %}">{{instance.quantity}}</a> {% endif %}
-                </td>
-                <td><a href="{% url 'reorder_level' instance.id %}">{{instance.reorder_level}}</a></td>
-                <td>{{instance.timestamp}}</td>
-                <td>{{instance.last_updated}}</td>
-                <td><a href="{% url 'delete_items' instance.id %}">Delete</a></td>
-              </tr>
-            </tbody>
-            {% endfor %}
-          </table>
-          <!-- <button onclick="exportTableToExcel('tblData', 'list-data')">Export Table Data To Excel File</button> -->
+      <div class="col-md-9">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">List of Items</h5>
+          </div>
+          <div class="card-body">
+            <table class='table table-striped' id="tblData">
+              <thead>
+                <tr>
+                  <!-- <th>COUNT</th> -->
+                  <!-- <th>ID</th> -->
+                  <th>CATEGORY</th>
+                  <th>ITEM NAME</th>
+                  <th>QUANTITY IN STORE</th>
+                  <th>REORDER LEVEL</th>
+                  <th>TIMESTAMP</th>
+                  <th>LAST UPDATED</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for instance in queryset %}
+                  <tr>
+                    <!-- <td>{{forloop.counter}}</td>
+                    <td>{{instance.id}}</td> -->
+                    <td>{{instance.category}}</td>
+                    <td><a href="{% url 'update_items' instance.id %}">{{instance.item_name}}</a></td>
+                    <td>
+                      {% if instance.reorder_level >= instance.quantity %}
+                        <div class="low-stock" style="background-color: orange;">
+                          <a href="{% url 'stock_detail' instance.id %}">{{instance.quantity}}</a>
+                        </div>
+                      {% else %} 
+                        <a href="{% url 'stock_detail' instance.id %}">{{instance.quantity}}</a> 
+                      {% endif %}
+                    </td>
+                    <td><a href="{% url 'reorder_level' instance.id %}">{{instance.reorder_level}}</a></td>
+                    <td>{{instance.timestamp}}</td>
+                    <td>{{instance.last_updated}}</td>
+                    <td>
+                      <a href="{% url 'update_items' instance.id %}" class="btn btn-primary btn-sm">Edit</a>
+                      <a href="{% url 'delete_items' instance.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <!-- <button onclick="exportTableToExcel('tblData', 'list-data')">Export Table Data To Excel File</button> -->
+          </div>
         </div>
       </div>
     </div>
-  </main>
-  <script src="{% static 'js/script.js' %}"></script>
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-</body>
-
-</html>
+  </div>
+{% endblock %}

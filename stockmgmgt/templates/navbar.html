@@ -1,73 +1,40 @@
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
-  <a class="navbar-brand" href="/">Stock Mgmt V1.0</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="/">Stock Mgmt V1.0</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
     </button>
-  <div class="collapse navbar-collapse" id="navbarCollapse">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-      </li>
-      {% if request.user.is_authenticated %}
-      <li class="nav-item">
-        <a class="nav-link" href="/list_items">List Items</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/add_items">Add Items</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/list_history">List History</a>
-      </li>
-      {% endif %}
-    </ul>
-    <ul class="navbar-nav ">
-      {% if request.user.is_authenticated %}
-      <li><a href="/accounts/logout"><button class="btn btn-dark">{{ user }} | Logout</button></a></li>
-      {% else %}
-      <li><a href="/accounts/login">Login</a></li>
-      {% endif %}
-    </ul>
-  </div>
-</nav>
-
-<a href="#">
-  <div id="version-display" data-toggle="modal" data-target="#myModal" class="bg-dark">SMIS Ver: 1.0</div>
-</a>
-<div class="bg-dark">
-  <div id="myModal" class="modal fade " role="dialog">
-    <div class="modal-dialog ">
-      <!-- Modal content-->
-      <div class="modal-content">
-
-        <div class="modal-header">
-          <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
-          <h4 class="modal-title">System Information -- Beta Version</h4>
-        </div>
-
-        <div class="modal-body">
-          <div class="dev-info">
-            <p class=""><b>STORE MANAGEMENT SYSTEM</b></p>
-            <p>VERSION: 1.O</p>
-
-            <p class="modal-header">DEVELOPERS:</p>
-            <p>
-              <a href="https://github.com/preciousimo" target="_blank">Precious Imoniakemu</a>
-            </p>
-            <p>
-              <a href="https://github.com/Bezaleel24" target="_blank">Emmanuel Adigwe</a>
-            </p>
-            <p>
-              <a href="https://github.com/samtobes" target="_blank">Samuel Ekeh</a>
-            </p>
-            <!-- <p><img src="/static/img/logo.png" alt="Developer Logo"></p> -->
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-
-      </div>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        {% if request.user.is_authenticated %}
+          <li class="nav-item {% if '/list_items/' in request.path %}active{% endif %}">
+            <a class="nav-link" href="/list_items/">List Items</a>
+          </li>
+          <li class="nav-item {% if '/add_items/' in request.path %}active{% endif %}">
+            <a class="nav-link" href="/add_items/">Add Items</a>
+          </li>
+          <li class="nav-item {% if '/list_history/' in request.path %}active{% endif %}">
+            <a class="nav-link" href="/list_history/">List History</a>
+          </li>
+        {% endif %}
+      </ul>
+      <ul class="navbar-nav">
+        {% if request.user.is_authenticated %}
+          <li class="nav-item">
+            <form method="POST" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button class="btn btn-dark" type="submit">{{ user.username }} | Logout</button>
+            </form>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            {% comment %} <a class="nav-link" href="{% url 'login' %}">Login</a> {% endcomment %}
+          </li>
+        {% endif %}
+      </ul>
     </div>
   </div>
-</div>
+</nav>

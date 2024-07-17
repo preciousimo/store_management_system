@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import User
+from users.models import User
 
 class Category(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
@@ -11,7 +11,7 @@ class Category(models.Model):
 
 class Stock(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True)
-    item_name = models.CharField(max_length=50, blank=True, null=True)
+    item_name = models.CharField(max_length=50, blank=True, null=True, unique=True)
     quantity = models.IntegerField(default=0, blank=True, null=True)
     supplier = models.CharField(max_length=50, blank=True, null=True)
     reorder_level = models.IntegerField(default=0, blank=True, null=True)

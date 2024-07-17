@@ -1,82 +1,47 @@
-{% load static %} {% load crispy_forms_tags %}
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
+{% block title %}Stock Detail - {{ queryset.item_name }}{% endblock %}
 
-  <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/navbar-fixed/">
+{% block content %}
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Stock Detail - {{ queryset.item_name }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <a href="{% url 'issue_items' queryset.id %}" class="btn btn-danger btn-block">ISSUE THIS ITEM</a>
+              </div>
+              <div class="col-md-6">
+                <a href="{% url 'receive_items' queryset.id %}" class="btn btn-primary btn-block">RECEIVE THIS ITEM</a>
+              </div>
+            </div>
 
-  <!-- Bootstrap core CSS -->
-
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
-
-  <style>
-    .bd-placeholder-img {
-      font-size: 1.125rem;
-      text-anchor: middle;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-    
-    @media (min-width: 768px) {
-      .bd-placeholder-img-lg {
-        font-size: 3.5rem;
-      }
-    }
-  </style>
-  <!-- Custom styles for this template -->
-  <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
-</head>
-
-<body>
-  {% include 'navbar.html' %}
-
-  <main role="main" class="container">
-    {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-      <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <div class="jumbotron">
-      <div class="header">{{header}}</div>
-      <br><br>
-      <a href="{% url 'issue_items' queryset.id %}">
-        <div class='btn btn-danger'>ISSUE THIS ITEM</div>
-      </a>
-      <a href="{% url 'receive_items' queryset.id %}">
-        <div class='btn btn-primary'>RECEIVE THIS ITEM</div>
-      </a>
-      <br><br>
-      <div class="display_table">
-        <table class='table'>
-          <tr>
-            <th>ITEM NAME</th>
-            <th>QUANTITY IN STORE</th>
-            <th>LAST UPDATED</th>
-            <th>REORDER LEVEL</th>
-          </tr>
-          <tr>
-            <td>{{queryset.item_name}}</td>
-            <td>{{queryset.quantity}}</td>
-            <td>{{queryset.last_updated}}</td>
-            <td>{{queryset.reorder_level}}</td>
-          </tr>
-        </table>
+            <table class='table table-bordered'>
+              <tr>
+                <th>ITEM NAME</th>
+                <td>{{ queryset.item_name }}</td>
+              </tr>
+              <tr>
+                <th>QUANTITY IN STORE</th>
+                <td>{{ queryset.quantity }}</td>
+              </tr>
+              <tr>
+                <th>LAST UPDATED</th>
+                <td>{{ queryset.last_updated }}</td>
+              </tr>
+              <tr>
+                <th>REORDER LEVEL</th>
+                <td>{{ queryset.reorder_level }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-  </main>
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-</body>
-
-</html>
+  </div>
+{% endblock %}

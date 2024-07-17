@@ -32,10 +32,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'stockmgmgt',
+    
     'crispy_forms',
     'crispy_bootstrap4',
-    'rest_framework',
+    
+    'stockmgmgt',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -169,7 +171,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
-ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window
-REGISTRATION_AUTO_LOGIN = True # Automatically log the user in.
-SITE_ID = 1
+LOGIN_URL = "login"
+LOGOUT_REDIRECT_URL = "/"
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 LOGIN_REDIRECT_URL = '/'
+
+
+AUTH_USER_MODEL = 'users.User'

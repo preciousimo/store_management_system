@@ -3,8 +3,9 @@ from django.http import HttpResponse
 import csv
 from django.contrib import messages
 from .models import Stock, Category, StockHistory
-from .forms import StockCreateForm, StockSearchForm, StockUpdateForm, IssueForm, ReceiveForm, ReorderLevelForm, StockHistorySearchForm
+from .forms import StockCreateForm, StockSearchForm, StockUpdateForm, StockIssueForm, StockReceiveForm, ReorderLevelForm, StockHistorySearchForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
 # Create your views here.
 
@@ -92,47 +93,54 @@ def stock_detail(request, pk):
 
 @login_required
 def issue_items(request, pk):
-    queryset = Stock.objects.get(id=pk)
-    form = IssueForm(request.POST or None, instance=queryset)
+    stock = Stock.objects.get(id=pk)
+    form = StockIssueForm(request.POST or None, initial={'stock_pk': pk})
     if form.is_valid():
-        instance = form.save(commit=False)
-        instance.quantity -= instance.issue_quantity
-        instance.issue_by = str(request.user)
-        messages.success(request, "Issued SUCCESSFULLY. " + str(instance.quantity) +
-                         " " + str(instance.item_name) + "s now left in Store")
-        instance.save()
+        # Use form.cleaned_data to get validated values
+        issue_quantity = form.cleaned_data['issue_quantity']
+        issue_to = form.cleaned_data['issue_to']
 
-        return redirect('/stock_detail/'+str(instance.id)) 
+        stock.quantity -= issue_quantity 
+        stock.issue_quantity = issue_quantity  
+        stock.issue_by = str(request.user)
+        stock.issue_to = issue_to
+        stock.save()
+
+        messages.success(request, f"Issued SUCCESSFULLY. {stock.quantity} {stock.item_name}s now left in Store")
+        return redirect('/stock_detail/'+str(stock.id)) 
 
     context = {
-        "title": 'Issue ' + str(queryset.item_name),
-        "queryset": queryset,
+        "title": 'Issue ' + str(stock.item_name),
+        "queryset": stock,
         "form": form,
         "username": 'Issue By: ' + str(request.user),
     }
-    return render(request, "add_items.html", context)
+    return render(request, "issue_items.html", context)
 
 @login_required
 def receive_items(request, pk):
-    queryset = Stock.objects.get(id=pk)
-    form = ReceiveForm(request.POST or None, instance=queryset)
+    stock = Stock.objects.get(id=pk)
+    form = StockReceiveForm(request.POST or None, initial={'stock_pk': pk})
     if form.is_valid():
-        instance = form.save(commit=False)
-        instance.quantity += instance.receive_quantity
-        instance.receive_by = str(request.user)
-        instance.save()
-        messages.success(request, "Received SUCCESSFULLY. " +
-                         str(instance.quantity) + " " + str(instance.item_name)+"s now in Store")
+        receive_quantity = form.cleaned_data['receive_quantity']
+        supplier = form.cleaned_data['supplier']
 
-        return redirect('/stock_detail/'+str(instance.id)) 
+        stock.quantity += receive_quantity
+        stock.receive_quantity = receive_quantity
+        stock.receive_by = str(request.user)
+        stock.supplier = supplier
+        stock.save()
+
+        messages.success(request, f"Received SUCCESSFULLY. {stock.quantity} {stock.item_name}s now in Store")
+        return redirect('/stock_detail/'+str(stock.id)) 
 
     context = {
-        "title": 'Receive ' + str(queryset.item_name),
-        "instance": queryset,
+        "title": 'Receive ' + str(stock.item_name),
+        "queryset": stock,
         "form": form,
         "username": 'Receive By: ' + str(request.user),
     }
-    return render(request, "add_items.html", context)
+    return render(request, "receive_items.html", context)
 
 @login_required
 def reorder_level(request, pk):
@@ -154,8 +162,8 @@ def reorder_level(request, pk):
 @login_required
 def list_history(request):
     header = 'LIST OF ITEMS'
-    queryset = StockHistory.objects.all()
     form = StockHistorySearchForm(request.POST or None)
+    queryset = StockHistory.objects.all()
     context = {
         "header": header,
         "queryset": queryset,
@@ -163,18 +171,26 @@ def list_history(request):
     }
 
     if request.method == 'POST':
-        category = form['category'].value()
-        start_date = form['start_date'].value()
-        end_date = form['end_date'].value()
+        if form.is_valid():
+            category = form.cleaned_data.get('category')
+            item_name = form.cleaned_data.get('item_name')
+            start_date = form.cleaned_data.get('start_date')
+            end_date = form.cleaned_data.get('end_date')
+            export_to_csv_value = form.cleaned_data.get('export_to_CSV')
 
-        if category:
-            queryset = queryset.filter(stock__category_id=category)
+            if category:
+                queryset = Stock.objects.filter(category=category)
+            if item_name:
+                queryset = Stock.objects.filter(item_name__icontains=item_name)
+            if start_date and end_date:
+                queryset = Stock.objects.filter(timestamp__range=[start_date, end_date])
 
-        if start_date and end_date:  # Only filter if both dates are provided
-            queryset = queryset.filter(timestamp__range=[start_date, end_date])
-
-        if form['export_to_CSV'].value():
-            return export_to_csv(queryset)
+            if export_to_csv_value:
+                return export_to_csv(queryset)
+                
+            queryset = StockHistory.objects.filter(stock__in=queryset)
+        else:
+            messages.error(request, "Invalid search form")
 
     return render(request, "list_history.html", context)
 
@@ -206,3 +222,10 @@ def export_to_csv(queryset):
              stock.timestamp]
         )
     return response
+
+
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('/')
